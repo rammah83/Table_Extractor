@@ -1,26 +1,31 @@
+import os
+import tempfile
 import streamlit as st
 import camelot
 from pdf_converter import get_table_from_pdf, get_tables_info, get_pdf_file_info
 import PyPDF2
 
-
+#region: Commun Header
 st.title("Extract Table from Pdf Files")
 st.caption("Made by M.RAHIMI@ocpgroup.ma")
 with st.sidebar:
     st.header("Welcome to my page")
+#endregion
+
 
 # upload files
 st.header("Upload pdf files")
-
-loaded_file = st.file_uploader(label="Upload pdf files", type=['pdf'], accept_multiple_files=False)
-pdf_file = "files/DRI_Micronutriments.pdf"
+loaded_file = st.file_uploader(
+    label="Upload pdf files", type=["pdf"], accept_multiple_files=False
+)
+# pdf_file = "files/DRI_Micronutriments.pdf"
 if loaded_file is not None:
     with st.expander(label="Display Pdf file Info", expanded=False):
         get_pdf_file_info(loaded_file)
-    
-if pdf_file:
+        
+if loaded_file.name.lower().endswith('.pdf'):
     if st.button(label=":green[Process Files]", type="secondary"):
-        tables = get_table_from_pdf(path_file=pdf_file, method="stream")
+        tables = get_table_from_pdf(uploaded_file=loaded_file, method="stream")
         infos = get_tables_info(tables)
         st.header("Info About Processing")
         st.write(f"Number of Tables : {len(tables)}")
@@ -30,4 +35,3 @@ if pdf_file:
         tabs = st.tabs(tabs_names)
         for i, table in enumerate(tables):
             tabs[i].dataframe(table.df, use_container_width=True)
-
